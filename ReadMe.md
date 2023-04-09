@@ -1,7 +1,10 @@
-OCCT 3D Viewer setup within Qt
+OCCT 3D Viewer setup within Qt (with Multitouch support)
 ==============================
 
 This sample demonstrates how to use Open CASCADE Technology (OCCT) 3D Viewer within a window created using Qt5 on Windows and Linux platforms.
+
+To support multitouch, combined with Qt's official "imagestures" project.
+https://doc.qt.io/qt-6/qtwidgets-gestures-imagegestures-example.html
 
 ![sample screenshot](/images/occt-qopenglwidget-sample-wnt.png)
 
