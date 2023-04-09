@@ -9,7 +9,7 @@ SOURCES = main.cpp \
           OcctQtViewer.cpp
 OTHER_FILES = LICENSE.md\
               ReadMe.md \
-              custom.pri.template
+              custom.pri
 
 # target configuration
 MY_TARGET_ABI = $${QMAKE_TARGET.arch}

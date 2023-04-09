@@ -110,6 +110,11 @@ public:
       setCentralWidget (myViewer);
     }
   }
+
+  void grabGestures(const QList<Qt::GestureType> &gestures)
+  {
+      myViewer->grabGestures(gestures);
+  }
 };
 
 int main (int theNbArgs, char** theArgVec)
@@ -131,8 +136,13 @@ int main (int theNbArgs, char** theArgVec)
   QSurfaceFormat::setDefaultFormat (aGlFormat);
 #endif
 
+  QList<Qt::GestureType> gestures;
+  gestures << Qt::PanGesture;
+  gestures << Qt::PinchGesture;
+
   MyMainWindow aMainWindow;
   aMainWindow.resize (aMainWindow.sizeHint());
+  aMainWindow.grabGestures(gestures);
   aMainWindow.show();
   return aQApp.exec();
 }

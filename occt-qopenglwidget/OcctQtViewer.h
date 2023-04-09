@@ -30,6 +30,10 @@
 #include <AIS_ViewController.hxx>
 #include <V3d_View.hxx>
 
+#include <QGestureEvent>
+#include <QPanGesture>
+#include <QPinchGesture>
+
 class AIS_ViewCube;
 
 //! OCCT 3D View.
@@ -62,11 +66,15 @@ public:
   //! Default widget size.
   virtual QSize sizeHint()        const override { return QSize(720, 480); }
 
+  //! Grabs Qt Gesture Types
+  void grabGestures(const QList<Qt::GestureType> &gestures);
+
 protected: // OpenGL events
 
   virtual void initializeGL() override;
   virtual void paintGL() override;
   //virtual void resizeGL(int , int ) override;
+  bool event(QEvent *event) override;
 
 protected: // user input events
 
@@ -89,6 +97,10 @@ private:
   virtual void handleViewRedraw (const Handle(AIS_InteractiveContext)& theCtx,
                                  const Handle(V3d_View)& theView) override;
 
+  bool gestureEvent(QGestureEvent *event);
+  void panTriggered(QPanGesture*);
+  void pinchTriggered(QPinchGesture*);
+
 private:
   Handle(V3d_Viewer)             myViewer;
   Handle(V3d_View)               myView;
@@ -97,6 +109,12 @@ private:
 
   QString myGlInfo;
   bool myIsCoreProfile;
+
+  qreal horizontalOffset;
+  qreal verticalOffset;
+  qreal rotationAngle;
+  qreal scaleFactor;
+  qreal currentStepScaleFactor;
 };
 
 #endif // _OcctQtViewer_HeaderFile

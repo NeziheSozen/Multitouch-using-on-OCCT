@@ -1,4 +1,4 @@
-CASROOT=c:/occt760-vc14-64/opencascade-7.6.0
+CASROOT=C:/OpenCASCADE-7.6.0-vc14-64/opencascade-7.6.0
 
 CASROOT_INCLUDES=$${CASROOT}/inc
 MY_OCCTINCDIR = $${CASROOT}/inc

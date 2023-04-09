@@ -579,3 +579,100 @@ void OcctQtViewer::handleViewRedraw (const Handle(AIS_InteractiveContext)& theCt
     updateView();
   }
 }
+
+// ================================================================
+// Function : grabGestures
+// Purpose  :
+// ================================================================
+
+void OcctQtViewer::grabGestures(const QList<Qt::GestureType> &gestures)
+{
+    //! [enable gestures]
+    for (Qt::GestureType gesture : gestures)
+        grabGesture(gesture);
+    //! [enable gestures]
+}
+
+// ================================================================
+// Function : event
+// Purpose  :
+// ================================================================
+bool OcctQtViewer::event(QEvent *event)
+{
+    if (event->type() == QEvent::Gesture)
+        return gestureEvent(static_cast<QGestureEvent*>(event));
+    return QWidget::event(event);
+}
+
+// ================================================================
+// Function : gestureEvent
+// Purpose  :
+// ================================================================
+bool OcctQtViewer::gestureEvent(QGestureEvent *event)
+{
+    qDebug() << "gestureEvent():" << event;
+    if (QGesture *pan = event->gesture(Qt::PanGesture))
+        panTriggered(static_cast<QPanGesture *>(pan));
+    if (QGesture *pinch = event->gesture(Qt::PinchGesture))
+        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+    return true;
+}
+
+// ================================================================
+// Function : panTriggered
+// Purpose  :
+// ================================================================
+void OcctQtViewer::panTriggered(QPanGesture *gesture)
+{
+#ifndef QT_NO_CURSOR
+    switch (gesture->state()) {
+        case Qt::GestureStarted:
+        case Qt::GestureUpdated:
+            setCursor(Qt::SizeAllCursor);
+            break;
+        default:
+            setCursor(Qt::ArrowCursor);
+    }
+#endif
+    QPointF delta = gesture->delta();
+    qDebug() << "panTriggered():" << gesture;
+    horizontalOffset += delta.x();
+    verticalOffset += delta.y();
+    myView->Pan(horizontalOffset, verticalOffset);
+    myView->Redraw();
+    update();
+}
+
+// ================================================================
+// Function : pinchTriggered
+// Purpose  :
+// ================================================================
+void OcctQtViewer::pinchTriggered(QPinchGesture *gesture)
+{
+    QPinchGesture::ChangeFlags changeFlags = gesture->changeFlags();
+    if (changeFlags & QPinchGesture::RotationAngleChanged) {
+        qreal rotationDelta = gesture->rotationAngle() - gesture->lastRotationAngle();
+        rotationAngle += rotationDelta;
+        qDebug() << "pinchTriggered(): rotate by" <<
+            rotationDelta << "->" << rotationAngle;
+        myView->Rotate(rotationAngle , false);
+        myView->Redraw();
+    }
+    if (changeFlags & QPinchGesture::ScaleFactorChanged) {
+        currentStepScaleFactor = gesture->totalScaleFactor();
+        qDebug() << "pinchTriggered(): zoom by" <<
+            gesture->scaleFactor() << "->" << currentStepScaleFactor;
+
+        double scalingValue = (gesture->totalScaleFactor() > 1) ? myView->Scale() + myView->Scale()/100:
+                                                                  myView->Scale() - myView->Scale()/100;
+
+        myView->SetScale(scalingValue);
+        myView->Redraw();
+    }
+    if (gesture->state() == Qt::GestureFinished) {
+        scaleFactor *= currentStepScaleFactor;
+        currentStepScaleFactor = 1;
+    }
+    update();
+}
+
